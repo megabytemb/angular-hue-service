@@ -11,12 +11,12 @@ angular.module("hue", []).service "hue", [
 
     isReady = false
 
-    _setup = ->
+    _setup = (createUser = false) ->
       deferred = $q.defer()
       if isReady
         deferred.resolve()
         return deferred.promise
-      if config.username == ""
+      if config.username == "" && !createUser
         $log.error "Error in setup: Username has to be set"
         deferred.reject
         return deferred.promise
@@ -178,7 +178,7 @@ angular.module("hue", []).service "hue", [
 
     # http://www.developers.meethue.com/documentation/configuration-api#71_create_user
     @createUser = (devicetype, username=false) ->
-      _setup().then ->
+      _setup(true).then ->
         user = {"devicetype": devicetype}
         user.username = username if username
         _apiCall "post", ["api"], user
