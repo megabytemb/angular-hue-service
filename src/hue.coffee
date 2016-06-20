@@ -1,5 +1,5 @@
 "use strict"
-angular.module("hue", []).service "hue", [
+angular.module("ngHue", []).service "ngHue", [
   "$http"
   "$q"
   "$log"

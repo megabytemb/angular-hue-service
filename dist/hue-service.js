@@ -1,5 +1,5 @@
 "use strict";
-angular.module("hue", []).service("hue", [
+angular.module("ngHue", []).service("ngHue", [
   "$http", "$q", "$log", function($http, $q, $log) {
     var buildApiUrl, config, getBridgeNupnp, isReady, _apiCall, _buildUrl, _del, _get, _post, _put, _responseHandler, _setup;
     config = {
