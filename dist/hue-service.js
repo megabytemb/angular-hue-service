@@ -1,13 +1,23 @@
 "use strict";
 angular.module("ngHue", []).service("ngHue", [
-  "$http", "$q", "$log", function($http, $q, $log) {
-    var buildApiUrl, config, getBridgeNupnp, isReady, _apiCall, _buildUrl, _del, _get, _post, _put, _responseHandler, _setup;
+  "$http", "$q", "$log", "$interval", function($http, $q, $log, $interval) {
+    var buildApiUrl, config, getBridgeNupnp, isReady, _apiCall, _buildUrl, _del, _get, _post, _put, _responseHandler, _setup, _waitForUsername;
     config = {
       username: "",
       apiUrl: "",
       bridgeIP: ""
     };
     isReady = false;
+    _waitForUsername = new Promise(function(resolve, reject) {
+      $interval((function(iteration) {
+        if (config.username !== '') {
+          return resolve();
+        }
+        if (iteration === iterations - 1) {
+          return reject();
+        }
+      }), 30, 2000);
+    });
     _setup = function(createUser) {
       var deferred;
       if (createUser == null) {
@@ -156,45 +166,61 @@ angular.module("ngHue", []).service("ngHue", [
       return angular.extend(config, newconfig);
     };
     this.getLights = function() {
-      return _setup().then(function() {
-        return _apiCall("get", ['lights']);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ['lights']);
+        });
       });
     };
     this.getNewLights = function() {
-      return _setup().then(function() {
-        return _apiCall("get", ['lights', 'new']);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ['lights', 'new']);
+        });
       });
     };
     this.searchNewLights = function() {
-      return _setup().then(function() {
-        return _apiCall("post", ['lights'], {});
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("post", ['lights'], {});
+        });
       });
     };
     this.getLight = function(id) {
-      return _setup().then(function() {
-        return _apiCall("get", ['lights', id]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ['lights', id]);
+        });
       });
     };
     this.setLightName = function(id, name) {
-      return _setup().then(function() {
-        return _apiCall("put", ['lights', id], {
-          "name": name
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("put", ['lights', id], {
+            "name": name
+          });
         });
       });
     };
     this.setLightState = function(id, state) {
-      return _setup().then(function() {
-        return _apiCall("put", ["lights", id, "state"], state);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("put", ["lights", id, "state"], state);
+        });
       });
     };
     this.getConfiguration = function() {
-      return _setup().then(function() {
-        return _apiCall("get", ["config"]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["config"]);
+        });
       });
     };
     this.setConfiguration = function(configuration) {
-      return _setup().then(function() {
-        return _apiCall("put", ["config"], configuration);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("put", ["config"], configuration);
+        });
       });
     };
     this.createUser = function(devicetype, username) {
@@ -213,75 +239,97 @@ angular.module("ngHue", []).service("ngHue", [
       });
     };
     this.deleteUser = function(username) {
-      return _setup().then(function() {
-        return _apiCall("delete", ["config", "whitelist", username]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("delete", ["config", "whitelist", username]);
+        });
       });
     };
     this.getFullState = function() {
-      return _setup().then(function() {
-        return _apiCall("get");
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get");
+        });
       });
     };
     this.getGroups = function() {
-      return _setup().then(function() {
-        return _apiCall("get", ["groups"]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["groups"]);
+        });
       });
     };
     this.createGroup = function(name, lights) {
-      return _setup().then(function() {
-        var body;
-        body = {
-          "lights": lights,
-          "name": name
-        };
-        $log.debug("Debug: createGroup body", body);
-        return _apiCall("post", ["groups"], body);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          var body;
+          body = {
+            "lights": lights,
+            "name": name
+          };
+          $log.debug("Debug: createGroup body", body);
+          return _apiCall("post", ["groups"], body);
+        });
       });
     };
     this.getGroupAttributes = function(id) {
-      return _setup().then(function() {
-        return _apiCall("get", ["groups", id]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["groups", id]);
+        });
       });
     };
     this.setGroupAttributes = function(id, name, lights) {
-      return _setup().then(function() {
-        var body;
-        body = {
-          "lights": lights,
-          "name": name
-        };
-        return _apiCall("put", ["groups", id], body);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          var body;
+          body = {
+            "lights": lights,
+            "name": name
+          };
+          return _apiCall("put", ["groups", id], body);
+        });
       });
     };
     this.setGroupState = function(id, state) {
-      return _setup().then(function() {
-        return _apiCall("put", ["groups", id, "action"], state);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("put", ["groups", id, "action"], state);
+        });
       });
     };
     this.deleteGroup = function(id) {
-      return _setup().then(function() {
-        return _apiCall("delete", ["groups", id]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("delete", ["groups", id]);
+        });
       });
     };
     this.getRules = function() {
-      return _setup().then(function() {
-        return _apiCall("get", ["rules"]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["rules"]);
+        });
       });
     };
     this.getRule = function(id) {
-      return _setup().then(function() {
-        return _apiCall("get", ["rules", id]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["rules", id]);
+        });
       });
     };
     this.createRule = function(name, conditions, actions) {
-      return _setup().then(function() {
-        var body;
-        body = {
-          "name": name,
-          "conditions": conditions,
-          "actions": actions
-        };
-        return _apiCall("post", ["rules"], body);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          var body;
+          body = {
+            "name": name,
+            "conditions": conditions,
+            "actions": actions
+          };
+          return _apiCall("post", ["rules"], body);
+        });
       });
     };
     this.updateRule = function(id, name, conditions, actions) {
@@ -294,30 +342,36 @@ angular.module("ngHue", []).service("ngHue", [
       if (actions == null) {
         actions = false;
       }
-      return _setup().then(function() {
-        var body;
-        body = {};
-        if (name) {
-          body.name = name;
-        }
-        if (conditions) {
-          body.conditions = conditions;
-        }
-        if (actions) {
-          body.actions = actions;
-        }
-        $log.debug("Debug: updateRule body", body);
-        return _apiCall("put", ["rules"], body);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          var body;
+          body = {};
+          if (name) {
+            body.name = name;
+          }
+          if (conditions) {
+            body.conditions = conditions;
+          }
+          if (actions) {
+            body.actions = actions;
+          }
+          $log.debug("Debug: updateRule body", body);
+          return _apiCall("put", ["rules"], body);
+        });
       });
     };
     this.deleteRule = function(id) {
-      return _setup().then(function() {
-        return _apiCall("delete", ["rules", id]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("delete", ["rules", id]);
+        });
       });
     };
     this.getSchedules = function() {
-      return _setup().then(function() {
-        return _apiCall("get", ["schedules"]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["schedules"]);
+        });
       });
     };
     this.createSchedule = function(name, description, command, time, status, autodelete) {
@@ -333,17 +387,19 @@ angular.module("ngHue", []).service("ngHue", [
       if (autodelete == null) {
         autodelete = false;
       }
-      return _setup().then(function() {
-        var body;
-        body = {
-          "name": name,
-          "description": description,
-          "command": command,
-          "time": time,
-          "status": status,
-          "autodelete": autodelete
-        };
-        return _apiCall("post", ["schedules"], body);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          var body;
+          body = {
+            "name": name,
+            "description": description,
+            "command": command,
+            "time": time,
+            "status": status,
+            "autodelete": autodelete
+          };
+          return _apiCall("post", ["schedules"], body);
+        });
       });
     };
     this.getScheduleAttributes = function(id) {
@@ -370,55 +426,67 @@ angular.module("ngHue", []).service("ngHue", [
       if (autodelete == null) {
         autodelete = null;
       }
-      return _setup().then(function() {
-        var body;
-        body = {};
-        if (name) {
-          body.name = name;
-        }
-        if (description) {
-          body.description = description;
-        }
-        if (command) {
-          body.command = command;
-        }
-        if (status) {
-          body.status = status;
-        }
-        if (autodelete !== null) {
-          body.autodelete = autodelete;
-        }
-        return _apiCall("put", ["schedules", id], body);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          var body;
+          body = {};
+          if (name) {
+            body.name = name;
+          }
+          if (description) {
+            body.description = description;
+          }
+          if (command) {
+            body.command = command;
+          }
+          if (status) {
+            body.status = status;
+          }
+          if (autodelete !== null) {
+            body.autodelete = autodelete;
+          }
+          return _apiCall("put", ["schedules", id], body);
+        });
       });
     };
     this.deleteSchedule = function(id) {
-      return _setup().then(function() {
-        return _apiCall("delete", ["schedules", id]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("delete", ["schedules", id]);
+        });
       });
     };
     this.getScenes = function() {
-      return _setup().then(function() {
-        return _apiCall("get", ["scenes"]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["scenes"]);
+        });
       });
     };
     this.createScene = function(id, name, lights) {
-      return _setup().then(function() {
-        var body;
-        body = {
-          "name": name,
-          "lights": lights
-        };
-        return _apiCall("put", ["scenes", id], body);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          var body;
+          body = {
+            "name": name,
+            "lights": lights
+          };
+          return _apiCall("put", ["scenes", id], body);
+        });
       });
     };
     this.updateScene = function(id, light, state) {
-      return _setup().then(function() {
-        return _apiCall("put", ["scenes", id, "lights", light, "state"], state);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("put", ["scenes", id, "lights", light, "state"], state);
+        });
       });
     };
     this.getSensors = function() {
-      return _setup().then(function() {
-        return _apiCall("get", ["sensors"]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["sensors"]);
+        });
       });
     };
     this.createSensor = function(name, modelid, swversion, type, uniqueid, manufacturername, state, config) {
@@ -428,62 +496,78 @@ angular.module("ngHue", []).service("ngHue", [
       if (config == null) {
         config = null;
       }
-      return _setup().then(function() {
-        var body;
-        body = {
-          "name": name,
-          "modelid": modelid,
-          "swversion": swversion,
-          "type": type,
-          "uniqueid": uniqueid,
-          "manufacturername": manufacturername
-        };
-        if (state) {
-          body.state = state;
-        }
-        if (config) {
-          body.config = config;
-        }
-        return _apiCall("post", ["sensors"], body);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          var body;
+          body = {
+            "name": name,
+            "modelid": modelid,
+            "swversion": swversion,
+            "type": type,
+            "uniqueid": uniqueid,
+            "manufacturername": manufacturername
+          };
+          if (state) {
+            body.state = state;
+          }
+          if (config) {
+            body.config = config;
+          }
+          return _apiCall("post", ["sensors"], body);
+        });
       });
     };
     this.searchNewSensors = function() {
-      return _setup().then(function() {
-        return _apiCall("post", ["sensors"], null);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("post", ["sensors"], null);
+        });
       });
     };
     this.getNewSensors = function() {
-      return _setup().then(function() {
-        return _apiCall("get", ["sensors", "new"]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["sensors", "new"]);
+        });
       });
     };
     this.getSensor = function(id) {
-      return _setup().then(function() {
-        return _apiCall("get", ["sensors", id]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["sensors", id]);
+        });
       });
     };
     this.renameSensor = function(id, name) {
-      return _setup().then(function() {
-        var body;
-        body = {
-          "name": name
-        };
-        return _apiCall("put", ["sensors", id], body);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          var body;
+          body = {
+            "name": name
+          };
+          return _apiCall("put", ["sensors", id], body);
+        });
       });
     };
     this.updateSensor = function(id, config) {
-      return _setup().then(function() {
-        return _apiCall("put", ["sensors", id, "config"], config);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("put", ["sensors", id, "config"], config);
+        });
       });
     };
     this.setSensorState = function(id, state) {
-      return _setup().then(function() {
-        return _apiCall("put", ["sensors", id, "state"], state);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("put", ["sensors", id, "state"], state);
+        });
       });
     };
     this.getTimezones = function() {
-      return _setup().then(function() {
-        return _apiCall("get", ["info", "timezones"]);
+      return _waitForUsername.then(function() {
+        return _setup().then(function() {
+          return _apiCall("get", ["info", "timezones"]);
+        });
       });
     };
     this.setEffect = (function(_this) {
