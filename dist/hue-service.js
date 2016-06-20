@@ -8,14 +8,17 @@ angular.module("hue", []).service("hue", [
       bridgeIP: ""
     };
     isReady = false;
-    _setup = function() {
+    _setup = function(createUser) {
       var deferred;
+      if (createUser == null) {
+        createUser = false;
+      }
       deferred = $q.defer();
       if (isReady) {
         deferred.resolve();
         return deferred.promise;
       }
-      if (config.username === "") {
+      if (config.username === "" && !createUser) {
         $log.error("Error in setup: Username has to be set");
         deferred.reject;
         return deferred.promise;
@@ -94,7 +97,7 @@ angular.module("hue", []).service("hue", [
     _responseHandler = function(name, response, deferred) {
       if ((response[0] != null) && response[0].error) {
         $log.error("" + name, response);
-        return deferred.reject;
+        return deferred.reject(response);
       } else {
         $log.debug("Response of " + name + ":", response);
         return deferred.resolve(response);
@@ -198,7 +201,7 @@ angular.module("hue", []).service("hue", [
       if (username == null) {
         username = false;
       }
-      return _setup().then(function() {
+      return _setup(true).then(function() {
         var user;
         user = {
           "devicetype": devicetype

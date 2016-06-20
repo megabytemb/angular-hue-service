@@ -87,7 +87,7 @@ angular.module("hue", []).service "hue", [
     _responseHandler = (name, response, deferred) ->
       if response[0]? && response[0].error
         $log.error "#{name}", response
-        deferred.reject
+        deferred.reject response
       else
         $log.debug "Response of #{name}:", response
         deferred.resolve response
