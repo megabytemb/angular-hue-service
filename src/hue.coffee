@@ -13,13 +13,14 @@ angular.module("ngHue", []).service "ngHue", [
     isReady = false
 	
     _waitForUsername = new Promise((resolve, reject) ->
+      iterations = 2000
       $interval ((iteration) ->
         if config.username != ''
           return resolve()
         if iteration == iterations - 1
           return reject()
         return
-      ), 30, 2000
+      ), 30, iterations
       return
     )
 
