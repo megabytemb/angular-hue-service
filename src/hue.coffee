@@ -138,6 +138,9 @@ angular.module("ngHue", []).service "ngHue", [
 
     @setup = (newconfig={}) ->
       angular.extend config, newconfig
+      
+    @discover = ->
+      getBridgeNupnp()
 
 
     # Get all lights

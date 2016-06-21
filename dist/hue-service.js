@@ -9,6 +9,8 @@ angular.module("ngHue", []).service("ngHue", [
     };
     isReady = false;
     _waitForUsername = new Promise(function(resolve, reject) {
+      var iterations;
+      iterations = 2000;
       $interval((function(iteration) {
         if (config.username !== '') {
           return resolve();
@@ -16,7 +18,7 @@ angular.module("ngHue", []).service("ngHue", [
         if (iteration === iterations - 1) {
           return reject();
         }
-      }), 30, 2000);
+      }), 30, iterations);
     });
     _setup = function(createUser) {
       var deferred;
@@ -164,6 +166,9 @@ angular.module("ngHue", []).service("ngHue", [
         newconfig = {};
       }
       return angular.extend(config, newconfig);
+    };
+    this.discover = function() {
+      return getBridgeNupnp();
     };
     this.getLights = function() {
       return _waitForUsername.then(function() {
