@@ -60,9 +60,9 @@ angular.module("ngHue", []).service "ngHue", [
     _put = (name, url, data) ->
       deferred = $q.defer()
       $http.put(url, data)
-        .success (response) ->
+        .then (response) ->
           _responseHandler name, response, deferred
-        .error (response) ->
+        .catch (response) ->
           $log.error "Error: #{name}", response
           deferred.reject
       deferred.promise
@@ -70,9 +70,9 @@ angular.module("ngHue", []).service "ngHue", [
     _post = (name, url, data) ->
       deferred = $q.defer()
       $http.post(url, data)
-        .success (response) ->
+        .then (response) ->
           _responseHandler name, response, deferred
-        .error (response) ->
+        .catch (response) ->
           $log.error "Error: #{name}", response
           deferred.reject
       deferred.promise
@@ -80,9 +80,9 @@ angular.module("ngHue", []).service "ngHue", [
     _del = (name, url) ->
       deferred = $q.defer()
       $http.delete(url)
-        .success (response) ->
+        .then (response) ->
           _responseHandler name, response, deferred
-        .error (response) ->
+        .catch (response) ->
           $log.error "Error: #{name}", response
           deferred.reject
       deferred.promise
@@ -90,9 +90,9 @@ angular.module("ngHue", []).service "ngHue", [
     _get = (name, url) ->
       deferred = $q.defer()
       $http.get(url)
-        .success (response) ->
+        .then (response) ->
           _responseHandler name, response, deferred
-        .error (response) ->
+        .catch (response) ->
           $log.error "#{name}", response
           deferred.reject
       deferred.promise
