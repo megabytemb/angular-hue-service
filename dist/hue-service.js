@@ -66,7 +66,7 @@ angular.module("ngHue", []).service("ngHue", [
       var deferred;
       deferred = $q.defer();
       $http.put(url, data).then(function(response) {
-        return _responseHandler(name, response, deferred);
+        return _responseHandler(name, response.data, deferred);
       })["catch"](function(response) {
         $log.error("Error: " + name, response);
         return deferred.reject;
@@ -77,7 +77,7 @@ angular.module("ngHue", []).service("ngHue", [
       var deferred;
       deferred = $q.defer();
       $http.post(url, data).then(function(response) {
-        return _responseHandler(name, response, deferred);
+        return _responseHandler(name, response.data, deferred);
       })["catch"](function(response) {
         $log.error("Error: " + name, response);
         return deferred.reject;
@@ -88,7 +88,7 @@ angular.module("ngHue", []).service("ngHue", [
       var deferred;
       deferred = $q.defer();
       $http["delete"](url).then(function(response) {
-        return _responseHandler(name, response, deferred);
+        return _responseHandler(name, response.data, deferred);
       })["catch"](function(response) {
         $log.error("Error: " + name, response);
         return deferred.reject;
@@ -99,7 +99,7 @@ angular.module("ngHue", []).service("ngHue", [
       var deferred;
       deferred = $q.defer();
       $http.get(url).then(function(response) {
-        return _responseHandler(name, response, deferred);
+        return _responseHandler(name, response.data, deferred);
       })["catch"](function(response) {
         $log.error("" + name, response);
         return deferred.reject;
